@@ -1,0 +1,6 @@
+name: robocon-11-robot-emulator
+author: Itsu
+version: 1.0.0
+main: dev.itsu.robocon.Main
+api-version: 1.0.13
+api: 1.0.13
