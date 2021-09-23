@@ -1,6 +1,6 @@
 package dev.itsu.robocon.packet.rpi
 
-class MeasureDistanceToBallPacket(data: IntArray) : RaspberryPiPacket(data) {
+class MeasureDistanceToBallPacket(data: ByteArray) : RaspberryPiPacket(data) {
 
     init {
         packetId = 40

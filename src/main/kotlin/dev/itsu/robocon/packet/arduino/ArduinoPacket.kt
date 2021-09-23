@@ -1,5 +1,8 @@
 package dev.itsu.robocon.packet.arduino
 
+import dev.itsu.robocon.Main
+import java.nio.ByteBuffer
+
 open class ArduinoPacket(var randId: Int) {
 
     companion object {
@@ -11,37 +14,46 @@ open class ArduinoPacket(var randId: Int) {
     }
 
     var packetId = UNKNOWN_PACKET_ID
-    var data = IntArray(PACKET_LENGTH)
+    var data = ByteArray(PACKET_LENGTH)
     var payload = arrayOf(
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0)
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0),
+        byteArrayOf(0, 0, 0, 0)
     )
 
     fun encode() {
-        data[0] = packetId.toString()[0].toString().toInt()
-        data[1] = packetId.toString()[1].toString().toInt()
-        data[2] = randId.toString()[0].toString().toInt()
-        data[3] = randId.toString()[1].toString().toInt()
-        data[4] = randId.toString()[2].toString().toInt()
-        data[5] = randId.toString()[3].toString().toInt()
+        encodeData()
 
-        for (i in 0..PACKET_LENGTH - 7) {
-            payload.forEach {
-                it.forEach {
-                    data[i + 6] = it
-                }
-            }
+        val dataList = mutableListOf<Byte>()
+        dataList.add(packetId.toString()[0].toString().toInt().toByte())
+        dataList.add(packetId.toString()[1].toString().toInt().toByte())
+        dataList.add(randId.toString()[0].toString().toInt().toByte())
+        dataList.add(randId.toString()[1].toString().toInt().toByte())
+        dataList.add(randId.toString()[2].toString().toInt().toByte())
+        dataList.add(randId.toString()[3].toString().toInt().toByte())
+
+        payload.forEach {
+            dataList.addAll(it.toList())
         }
+
+        data = dataList.toByteArray()
+    }
+
+    open fun encodeData() {
+
+    }
+
+    fun floatToArray(value: Float): ByteArray {
+        return ByteBuffer.allocate(4).putFloat(value).array()
     }
 
 }

@@ -1,6 +1,6 @@
 package dev.itsu.robocon.packet.rpi
 
-class UpperServoMotorPacket(data: IntArray) : RaspberryPiPacket(data) {
+class UpperServoMotorPacket(data: ByteArray) : RaspberryPiPacket(data) {
 
     init {
         packetId = 60

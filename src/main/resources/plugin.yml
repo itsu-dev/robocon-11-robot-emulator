@@ -4,3 +4,8 @@ version: 1.0.0
 main: dev.itsu.robocon.Main
 api-version: 1.0.13
 api: 1.0.13
+commands:
+  spawnrobot:
+    usage: /spawnrobot
+    description: spawn robot.
+    aliases: ["sr"]

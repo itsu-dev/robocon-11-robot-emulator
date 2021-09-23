@@ -9,7 +9,7 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.SocketAddress
 
-class ConnectionManager(private val instance: Main) : AsyncTask() {
+object ConnectionManager : AsyncTask() {
 
     private val receiveSocket = DatagramSocket(1234)
     private val sendSocket = DatagramSocket()
@@ -18,8 +18,7 @@ class ConnectionManager(private val instance: Main) : AsyncTask() {
     private val eventListener = PacketEventListener(this)
 
     override fun onRun() {
-        sendDirect("Transmission Start".toByteArray())
-        while (instance.running && receive());
+        while (Main.INSTANCE.running && receive());
     }
 
     private fun receive(): Boolean {
@@ -36,18 +35,13 @@ class ConnectionManager(private val instance: Main) : AsyncTask() {
         if (message.isEmpty()) return false
 
         sendId(message)
-        processPacket(message)
+        processPacket(buf)
 
-        instance.logger.info("${TextFormat.BLUE}[RECEIVE] ${TextFormat.RESET}(${pk.length}) $message")
+        Main.INSTANCE.logger.info("${TextFormat.BLUE}[RECEIVE] ${TextFormat.RESET}(${pk.length}) $message")
         return true
     }
 
-    private fun processPacket(message: String) {
-        val randId = message.substring(2, 6).toInt()
-        val data = IntArray(RaspberryPiPacket.PACKET_LENGTH)
-
-        message.forEachIndexed { index, c -> data[index] = c.toString().toInt() }
-
+    private fun processPacket(data: ByteArray) {
         val pk = RaspberryPiPacket(data)
         pk.decode()
 
@@ -65,10 +59,7 @@ class ConnectionManager(private val instance: Main) : AsyncTask() {
 
     fun dataPacket(pk: ArduinoPacket) {
         pk.encode()
-
-        var message = ""
-        pk.data.forEach { message += it.toString() }
-        sendMessage(message)
+        sendDirect(pk.data)
     }
 
     private fun sendStop() {
@@ -79,18 +70,14 @@ class ConnectionManager(private val instance: Main) : AsyncTask() {
         sendDirect(message.substring(2, 6).toByteArray())
     }
 
-    private fun sendMessage(message: String) {
-        val data = mutableListOf<Byte>()
-        message.forEach {
-            data.add(it.toString().toInt().toByte())
-        }
-        sendDirect(data.toByteArray())
-    }
-
     private fun sendDirect(byteArray: ByteArray) {
         val pk = DatagramPacket(byteArray, byteArray.size, inetAddress, 4321)
         sendSocket.send(pk)
-        instance.logger.info("${TextFormat.GREEN}[SEND] ${TextFormat.RESET}(${pk.length}) ${String(byteArray)}")
+        Main.INSTANCE.logger.info("${TextFormat.GREEN}[SEND] ${TextFormat.RESET}(${pk.length}) ${String(byteArray)}")
+    }
+
+    fun start() {
+        sendDirect("Transmission Start".toByteArray())
     }
 
 }
